@@ -6,6 +6,7 @@
     <meta name="fc:frame" content="vNext">
     <meta name="fc:frame:image" content="https://www.vaults.fyi/images/emojis/bankEmoji.png">
     <meta name="fc:frame:button:1" content="vaults.fyi">
+    <meta name="fc:frame:button:2" content="Get Aave v3 DAI rate">
     <meta name="fc:frame:post_url" content="https://your-frame-server.com/process-button-click">
     <meta name="og:image" content="https://www.vaults.fyi/images/emojis/bankEmoji.png">
     <title>Vaults.fyi Link</title>
@@ -39,21 +40,54 @@
             margin-top: 20px;
             cursor: pointer;
         }
+        .data-container {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="frame">
         <img class="cover-image" src="https://www.vaults.fyi/images/emojis/bankEmoji.png" alt="Cover Image">
+        <p class="description">Get the latest rates from vaults.fyi</p>
         <a class="button" href="https://vaults.fyi/" target="_blank" onclick="window.open('https://vaults.fyi/', '_blank').focus();">vaults.fyi</a>
+        <a class="button" onclick="fetchData('https://api.vaults.fyi/v1/vaults/mainnet/0x018008bfb33d285247A21d44E50697654f754e63/')">Get Aave v3 DAI rate</a>
+        <div class="data-container"></div>
     </div>
     <script>
         const buttons = document.querySelectorAll('.button');
+        const dataContainer = document.querySelector('.data-container');
+
         buttons.forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.open(e.currentTarget.href, '_blank').focus();
+                if (e.currentTarget.href) {
+                    window.open(e.currentTarget.href, '_blank').focus();
+                } else {
+                    const apiUrl = e.currentTarget.getAttribute('onclick').match(/'(.*?)'/)[1];
+                    fetchData(apiUrl);
+                }
             });
         });
+
+        function fetchData(url) {
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const apy = data.apy;
+                    const formattedApy = (apy / 100).toFixed(2) + '%';
+                    dataContainer.textContent = `7-day APY: ${formattedApy}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    dataContainer.textContent = 'Error fetching data';
+                });
+        }
     </script>
 </body>
 </html>
